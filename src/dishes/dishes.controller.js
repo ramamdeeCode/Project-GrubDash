@@ -6,7 +6,7 @@ const dishes = require(path.resolve("src/data/dishes-data"));
 // Use this function to assign ID's when necessary
 const nextId = require("../utils/nextId");
 
-// TODO: Implement the /dishes handlers needed to make the tests pass
+//validators
 
 //check if dish exist
 const isDishExists = (req, res, next) => {
@@ -51,6 +51,8 @@ const bodyDataHas = (propertyName) => {
     next({ status: 400, message: `Must include a ${propertyName}` });
   };
 };
+
+// TODO: Implement the /dishes handlers needed to make the tests pass
 
 //create dish handler
 const create = (req, res, next) => {
