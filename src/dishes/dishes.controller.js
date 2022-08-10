@@ -20,10 +20,22 @@ const isDishExists = (req, res, next) => {
   }
 };
 
+//check if id meet createria for updating dish
+const idMatchesRouteParam = (req, res, next) => {
+  const { id } = req.body.data;
+  const { dishId } = req.params;
+  return !id || id === dishId
+    ? next()
+    : next({
+        status: 400,
+        message: `Dish id does not match route id. Dish: ${id}, Route: ${dishId}`,
+      });
+};
+
 ///validate price property if is greater than an int and greater than 0
 const pricePropertyIsvalid = (req, res, next) => {
   const { data: { price } = {} } = req.body;
-  return Number.isInteger(Number(price)) && price > 0
+  return typeof price === "number" && price > 0
     ? next()
     : next({
         status: 400,
@@ -55,6 +67,19 @@ const create = (req, res, next) => {
   res.status(201).json({ data: newDish });
 };
 
+const update = (req, res) => {
+  const dish = res.locals.dish;
+
+  const { data: { name, description, price, image_url } = {} } = req.body;
+
+  dish.name = name;
+  dish.description = description;
+  dish.price = price;
+  dish.image_url = image_url;
+
+  res.json({ data: dish });
+};
+
 //get dish by id
 const read = (req, res) => {
   res.json({ data: res.locals.dish });
@@ -73,6 +98,16 @@ module.exports = {
     bodyDataHas("image_url"),
     pricePropertyIsvalid,
     create,
+  ],
+  update: [
+    isDishExists,
+    bodyDataHas("name"),
+    bodyDataHas("description"),
+    bodyDataHas("price"),
+    bodyDataHas("image_url"),
+    idMatchesRouteParam,
+    pricePropertyIsvalid,
+    update,
   ],
   read: [isDishExists, read],
   list,
