@@ -51,10 +51,6 @@ const isDishQuantity = (req, res, next) => {
   }
 };
 
-// a dish quantity property is missing	Dish ${index} must have a quantity that is an integer greater than 0
-// a dish quantity property is zero or less	Dish ${index} must have a quantity that is an integer greater than 0
-// a dish quantity property is not an integer	Dish ${index} must have a quantity that is an integer greater than 0
-
 //check body have property
 const bodyHasProperty = (propertyName) => {
   return (req, res, next) => {
@@ -83,6 +79,38 @@ const isOrderExists = (req, res, next) => {
   }
 };
 
+//check if id meet createria for updating order
+const idMatchesRouteParam = (req, res, next) => {
+  const { id } = req.body.data;
+  const { orderId } = req.params;
+  return !id || id === orderId
+    ? next()
+    : next({
+        status: 400,
+        message: `Order id does not match route id. Order: ${id}, Route: ${orderId}`,
+      });
+};
+
+//check order status
+const checkOrderStatus = (req, res, next) => {
+  const { data: { status } = {} } = req.body;
+  const orderStatus = ["pending", "preparing", "out-for-delivery"];
+  if (orderStatus.includes(status)) {
+    next();
+  } else if (status === "delivered") {
+    next({
+      status: 400,
+      message: `A delivered order cannot be changed.`,
+    });
+  } else {
+    next({
+      status: 400,
+      message:
+        "Order must have a status of pending, preparing, out-for-delivery, delivered.",
+    });
+  }
+};
+
 // TODO: Implement the /orders handlers needed to make the tests pass
 
 //create dish handler
@@ -97,6 +125,18 @@ const create = (req, res, next) => {
   };
   orders.push(newOrder);
   res.status(201).json({ data: newOrder });
+};
+
+const update = (req, res, next) => {
+  const order = res.locals.order;
+  const { data: { deliverTo, mobileNumber, status, dishes } = {} } = req.body;
+
+  order.deliverTo = deliverTo;
+  order.mobileNumber = mobileNumber;
+  order.status = status;
+  order.dishes = dishes;
+
+  res.json({ data: order });
 };
 
 //get order by id
@@ -116,7 +156,21 @@ module.exports = {
     isDishArrayWithContent,
     isDishQuantity,
     checkDishQuantity,
+
     create,
+  ],
+  update: [
+    bodyHasProperty("deliverTo"),
+    bodyHasProperty("mobileNumber"),
+    bodyHasProperty("status"),
+    bodyHasProperty("dishes"),
+    isOrderExists,
+    isDishArrayWithContent,
+    idMatchesRouteParam,
+    isDishQuantity,
+    checkDishQuantity,
+    checkOrderStatus,
+    update,
   ],
   read: [isOrderExists, read],
   list,
