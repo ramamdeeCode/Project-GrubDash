@@ -111,6 +111,19 @@ const checkOrderStatus = (req, res, next) => {
   }
 };
 
+//check order if is pending
+const isOrderPending = (req, res, next) => {
+  const order = res.locals.order;
+  if (order.status === "pending") {
+    next();
+  } else {
+    next({
+      status: 400,
+      message: "An order cannot be deleted unless it is pending",
+    });
+  }
+};
+
 // TODO: Implement the /orders handlers needed to make the tests pass
 
 //create dish handler
@@ -127,6 +140,7 @@ const create = (req, res, next) => {
   res.status(201).json({ data: newOrder });
 };
 
+//update order
 const update = (req, res, next) => {
   const order = res.locals.order;
   const { data: { deliverTo, mobileNumber, status, dishes } = {} } = req.body;
@@ -143,6 +157,15 @@ const update = (req, res, next) => {
 const read = (req, res) => {
   res.json({ data: res.locals.order });
 };
+
+//delete order
+const destroy = (req, res) => {
+  const { orderId } = req.params;
+  const index = orders.findIndex((order) => order.id === orderId);
+  const deleteOrder = orders.splice(index, 1);
+  res.sendStatus(204);
+};
+
 //get all the orders
 const list = (req, res) => {
   res.json({ data: orders });
@@ -173,5 +196,6 @@ module.exports = {
     update,
   ],
   read: [isOrderExists, read],
+  delete: [isOrderExists, isOrderPending, destroy],
   list,
 };
