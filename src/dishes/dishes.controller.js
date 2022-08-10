@@ -8,6 +8,18 @@ const nextId = require("../utils/nextId");
 
 // TODO: Implement the /dishes handlers needed to make the tests pass
 
+//check if dish exist
+const isDishExists = (req, res, next) => {
+  const { dishId } = req.params;
+  const getDish = dishes.find((dish) => dish.id === dishId);
+  if (getDish) {
+    res.locals.dish = getDish;
+    return next();
+  } else {
+    next({ status: 404, message: `Dish id not found: ${dishId}.` });
+  }
+};
+
 ///validate price property if is greater than an int and greater than 0
 const pricePropertyIsvalid = (req, res, next) => {
   const { data: { price } = {} } = req.body;
@@ -19,6 +31,7 @@ const pricePropertyIsvalid = (req, res, next) => {
       });
 };
 
+//validate  property value
 const bodyDataHas = (propertyName) => {
   return (req, res, next) => {
     const { data = {} } = req.body;
@@ -27,10 +40,9 @@ const bodyDataHas = (propertyName) => {
   };
 };
 
-//create dish
+//create dish handler
 const create = (req, res, next) => {
   const { data: { name, description, price, image_url } = {} } = req.body;
-
   const newDish = {
     id: nextId(),
     name,
@@ -41,6 +53,11 @@ const create = (req, res, next) => {
 
   dishes.push(newDish);
   res.status(201).json({ data: newDish });
+};
+
+//get dish by id
+const read = (req, res) => {
+  res.json({ data: res.locals.dish });
 };
 
 //get all the dishes
@@ -57,5 +74,6 @@ module.exports = {
     pricePropertyIsvalid,
     create,
   ],
+  read: [isDishExists, read],
   list,
 };
