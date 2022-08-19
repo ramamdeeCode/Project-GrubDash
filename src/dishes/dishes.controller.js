@@ -6,10 +6,10 @@ const dishes = require(path.resolve("src/data/dishes-data"));
 // Use this function to assign ID's when necessary
 const nextId = require("../utils/nextId");
 
-//validators
+/*--------------------------------validators---------------------------*/
 
-//check if dish exist
-const isDishExists = (req, res, next) => {
+//check if dish exist middleware
+function isDishExists(req, res, next) {
   const { dishId } = req.params;
   const getDish = dishes.find((dish) => dish.id === dishId);
   if (getDish) {
@@ -18,10 +18,10 @@ const isDishExists = (req, res, next) => {
   } else {
     next({ status: 404, message: `Dish id not found: ${dishId}.` });
   }
-};
+}
 
-//check if id meet createria for updating dish
-const idMatchesRouteParam = (req, res, next) => {
+//check if id meet createria for updating dish middleware
+function idMatchesRouteParam(req, res, next) {
   const { id } = req.body.data;
   const { dishId } = req.params;
   return !id || id === dishId
@@ -30,10 +30,10 @@ const idMatchesRouteParam = (req, res, next) => {
         status: 400,
         message: `Dish id does not match route id. Dish: ${id}, Route: ${dishId}`,
       });
-};
+}
 
-///validate price property if is greater than an int and greater than 0
-const pricePropertyIsvalid = (req, res, next) => {
+//validate price property if is greater than an int and greater than 0 middleware
+function pricePropertyIsvalid(req, res, next) {
   const { data: { price } = {} } = req.body;
   return typeof price === "number" && price > 0
     ? next()
@@ -41,21 +41,21 @@ const pricePropertyIsvalid = (req, res, next) => {
         status: 400,
         message: "Dish must have a price that is an integer greater than 0",
       });
-};
+}
 
-//validate  property value
-const bodyDataHas = (propertyName) => {
+//validate  property value middleware
+function bodyDataHas(propertyName) {
   return (req, res, next) => {
     const { data = {} } = req.body;
     if (data[propertyName]) return next();
     next({ status: 400, message: `Must include a ${propertyName}` });
   };
-};
+}
 
-// TODO: Implement the /dishes handlers needed to make the tests pass
+/* ----------------dishes handlers needed to make the tests pass --------------*/
 
-//create dish handler
-const create = (req, res, next) => {
+//Create Handler
+function create(req, res, next) {
   const { data: { name, description, price, image_url } = {} } = req.body;
   const newDish = {
     id: nextId(),
@@ -67,9 +67,10 @@ const create = (req, res, next) => {
 
   dishes.push(newDish);
   res.status(201).json({ data: newDish });
-};
+}
 
-const update = (req, res) => {
+//Update Handler
+function update(req, res) {
   const dish = res.locals.dish;
 
   const { data: { name, description, price, image_url } = {} } = req.body;
@@ -80,17 +81,17 @@ const update = (req, res) => {
   dish.image_url = image_url;
 
   res.json({ data: dish });
-};
+}
 
-//get dish by id
-const read = (req, res) => {
+//read handler
+function read(req, res) {
   res.json({ data: res.locals.dish });
-};
+}
 
-//get all the dishes
-const list = (req, res) => {
+//list handler
+function list(req, res) {
   res.json({ data: dishes });
-};
+}
 
 module.exports = {
   create: [
