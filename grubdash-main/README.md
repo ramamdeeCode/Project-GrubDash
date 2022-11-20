@@ -1,10 +1,5 @@
-# Project-GrubDash
+# Project-GrubDash-Backend
 
-## Installation 
-
-1.  Fork / clone this repository.
-2.  Run npm install.
-3.  Use npm start to run the application.
 
 ## Description
 
