@@ -1,16 +1,10 @@
-# Project-GrubDash
-
-## Installation
-
-1.  Fork / clone this repository.
-2.  Run npm install.
-3.  Use npm start to run the application.
+# Project-GrubDash-Backend
 
 ## Description
 
-- This is an API project following **RESTful design principles** for a Grub-Dash-Front-End found [here](https://github.com/ramamdeeCode/Project-GrubDash/blob/master/grubdash-main/README.md)
+- This is an API project following **RESTful design principles** for a Grub-Dash-Front-End found [here](https://github.com/ramamdeeCode/grub-dash-front-end.git)
 
-[live Server](https://grub-dash-frontend.onrender.com)
+[Live Project Back-end](https://project-grubdash-backend.onrender.com)
 
 ![image](https://user-images.githubusercontent.com/86864383/183989221-3499e80c-8ada-447d-93a9-c99f148b48dd.png)
 
